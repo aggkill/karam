@@ -882,6 +882,7 @@
 <script>
   // Google Sheets backend
   const SHEET_URL = 'https://script.google.com/macros/s/AKfycby4TNB8E_xx91CWZ3S4PhltIDgcWjOjSqArQOgHWIN-nOj4g_kG9lfY4UJL-5qBYuBr/exec';
+  const SECRET_KEY = 'karam-2026-family';
 
   // State
   let entries = JSON.parse(localStorage.getItem('karam_entries') || '[]');
@@ -893,7 +894,7 @@
   // Fetch entries from Google Sheets on load
   async function fetchEntries() {
     try {
-      const res = await fetch(SHEET_URL);
+      const res = await fetch(`${SHEET_URL}?secret=${SECRET_KEY}`);
       const data = await res.json();
       if (data.success && data.entries) {
         entries = data.entries.map(e => ({
@@ -1057,7 +1058,7 @@
     try {
       const res = await fetch(SHEET_URL, {
         method: 'POST',
-        body: JSON.stringify(entry)
+        body: JSON.stringify({ ...entry, secret: SECRET_KEY })
       });
       const data = await res.json();
       if (data.success) {
