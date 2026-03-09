@@ -898,23 +898,19 @@
       const data = await res.json();
       if (data.success && data.entries) {
         entries = data.entries.map(e => {
-          // Try to parse the timestamp back to a proper date
-          // Google Sheets returns dates in local format like "3/7/2026, 8:46:00 PM"
-          // We store the original ISO date in the sheet via the 'date' field
-          let entryDate = e.Timestamp;
-          // Try parsing - if it fails or gives wrong year, use current time
+          // Use the raw ISO date stored in column H, fall back to Timestamp
+          const isoDate = e.ISODate || e.Timestamp;
+          let entryDate;
           try {
-            const parsed = new Date(entryDate);
-            if (isNaN(parsed.getTime()) || parsed.getFullYear() < 2024) {
-              entryDate = new Date().toISOString();
-            } else {
-              entryDate = parsed.toISOString();
-            }
+            const parsed = new Date(isoDate);
+            entryDate = (!isNaN(parsed.getTime()) && parsed.getFullYear() >= 2024)
+              ? parsed.toISOString()
+              : new Date().toISOString();
           } catch(err) {
             entryDate = new Date().toISOString();
           }
           return {
-            id: e.Timestamp,
+            id: entryDate,
             type: e.Type,
             category: e.Category,
             amount: parseFloat(e.Amount),
