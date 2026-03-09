@@ -897,15 +897,32 @@
       const res = await fetch(`${SHEET_URL}?secret=${SECRET_KEY}`);
       const data = await res.json();
       if (data.success && data.entries) {
-        entries = data.entries.map(e => ({
-          id: e.Timestamp,
-          type: e.Type,
-          category: e.Category,
-          amount: parseFloat(e.Amount),
-          note: e.Note,
-          loggedBy: e['Logged By'] || e.LoggedBy || '',
-          date: e.Timestamp
-        })).filter(e => e.amount > 0).reverse();
+        entries = data.entries.map(e => {
+          // Try to parse the timestamp back to a proper date
+          // Google Sheets returns dates in local format like "3/7/2026, 8:46:00 PM"
+          // We store the original ISO date in the sheet via the 'date' field
+          let entryDate = e.Timestamp;
+          // Try parsing - if it fails or gives wrong year, use current time
+          try {
+            const parsed = new Date(entryDate);
+            if (isNaN(parsed.getTime()) || parsed.getFullYear() < 2024) {
+              entryDate = new Date().toISOString();
+            } else {
+              entryDate = parsed.toISOString();
+            }
+          } catch(err) {
+            entryDate = new Date().toISOString();
+          }
+          return {
+            id: e.Timestamp,
+            type: e.Type,
+            category: e.Category,
+            amount: parseFloat(e.Amount),
+            note: e.Note,
+            loggedBy: e['Logged By'] || e.LoggedBy || '',
+            date: entryDate
+          };
+        }).filter(e => e.amount > 0).reverse();
         localStorage.setItem('karam_entries', JSON.stringify(entries));
         updateSummary();
       }
