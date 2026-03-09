@@ -6,7 +6,67 @@
   <title>Karam – കരം</title>
   <meta name="theme-color" content="#1a1a2e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Karam" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <script>
+    // Generate icon canvas and set as apple-touch-icon dynamically
+    window.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // Background
+      const grad = ctx.createLinearGradient(0, 0, 512, 512);
+      grad.addColorStop(0, '#1a1a2e');
+      grad.addColorStop(1, '#0f0f1a');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, 512, 512, 100);
+      ctx.fill();
+
+      // Gold glow
+      const glow = ctx.createRadialGradient(256, 220, 20, 256, 220, 220);
+      glow.addColorStop(0, 'rgba(232,197,71,0.18)');
+      glow.addColorStop(1, 'rgba(232,197,71,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Malayalam കരം text
+      ctx.fillStyle = '#e8c547';
+      ctx.font = 'bold 148px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('കരം', 256, 230);
+
+      // Thin gold line
+      ctx.strokeStyle = 'rgba(232,197,71,0.4)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(80, 310);
+      ctx.lineTo(432, 310);
+      ctx.stroke();
+
+      // Karam in latin below
+      ctx.fillStyle = 'rgba(240,237,230,0.6)';
+      ctx.font = '500 72px serif';
+      ctx.fillText('karam', 256, 390);
+
+      const dataUrl = canvas.toDataURL('image/png');
+
+      // Set apple touch icon
+      const link = document.createElement('link');
+      link.rel = 'apple-touch-icon';
+      link.href = dataUrl;
+      document.head.appendChild(link);
+
+      // Also set favicon
+      const favicon = document.createElement('link');
+      favicon.rel = 'icon';
+      favicon.href = dataUrl;
+      document.head.appendChild(favicon);
+    });
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
